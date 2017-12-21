@@ -4,6 +4,10 @@ This repository contains the data for the MedFlies population supression model d
 
 ## Files Descriptions
 
+### Simulation Files
+
+Lorem ipsum
+
 ### Datasets
 
 Folders named *N____* store the data for the simulations with population size dictated by the digits following the *N* multiplied by 1000.
@@ -65,6 +69,10 @@ Where the IDs are specified as follows:
 
       * Z: Repetition number
         - Each experiment was repeated 52 times
+
+### Figures
+
+Lorem ipsum
 
 ## Authors
 
