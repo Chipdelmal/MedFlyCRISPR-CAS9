@@ -1,22 +1,52 @@
 # MedFlyCRISPR-CAS9
 
-This repository contains the data for the MedFlies population supression model described in the paper: PAPER TITLE HERE.
+This repository contains the data for the MedFlies population suppression model described in the paper: PAPER TITLE HERE.
+
+## Experiments Description
+
+Two sets of experiments took place as part of this modeling endeavor, which will be described in the following subsections of this document.
+
+### Population Dynamics Visual Inspection
+
+For these experiments we performed a 1:1 CRISPR/CAS9 release into the population with various resistant allele regeneration rates to show the general dynamics expected from the gene drive.
+
+This is intended as a demonstration of how the drive works in suppressing the population.
+
+![populationDynamics](./images/Medfly_001_1.jpg)
+![populationDynamics](./images/Medfly_001_2.jpg)
+
+
+### Calculation of Population Suppression Thresholds as Function of Resistant Allele Regeneration Rate
+
+After the visual inspection, we did a thorough exploration of the population suppression probabilities at three population sizes: 1000, 10000, and 100000. This was done with 1:1 releases at various levels of resistant allele regeneration rates (see the _Datasets/Population Suppression Thresholds as Function of Resistant Allele Regeneration Rate_ section of this document for more information of the rates used).
+
+![populationDynamics](./images/ResponseN001.jpg)
 
 ## Files Descriptions
+
+As part of the publication, we are releasing the dataset files used to generate our figures for reproducibility purposes.
+
+<!--
+as well as the code that describes our model.
 
 ### Simulation Files
 
 Lorem ipsum
+-->
 
 ### Datasets
 
 The datasets are compressed in _7z_ format, which can be unarchived using free software such as: [Keka](http://www.kekaosx.com/en/) or [7zip](http://www.7-zip.org/download.html).
 
-#### Population Dynamics Examples
+#### Population Dynamics Visual Inspection
+
+Files named *VI_N___.7z.___* store the data for the visual inspection simulations with population size dictated by the digits following the *N* divided by 1000.
+
+For the nomenclature of these filenames please refer to the following section of this document (as it describes in detail the key for the naming conventions).
 
 #### Population Suppression Thresholds as Function of Resistant Allele Regeneration Rate
 
-Files named *N____.7z.___* store the data for the simulations with population size dictated by the digits following the *N* multiplied by 1000.
+Files named *CT_N___.7z.___* store the data for the simulations con the calculation of suppression thresholds, with population size dictated by the digits following the *N* divided by 1000.
 
 Each one of the files contained within these folders is named according to the following nomenclature:
 
@@ -82,4 +112,4 @@ Lorem ipsum
 
 ## Authors
 
- * [Héctor M. Sánchez C.](chipdelmal.github.io), John M. Marshall
+ <!--* [Héctor M. Sánchez C.](chipdelmal.github.io), John M. Marshall-->
