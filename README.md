@@ -104,11 +104,7 @@ Where the IDs are specified as follows:
         - 32: 50e-3
 
       * Z: Repetition number
-        - Each experiment was repeated 52 times
-
-### Figures
-
-Lorem ipsum
+        - Each experiment was repeated 52 times. The specific number of the iteration is denoted by these digits.
 
 ## Authors
 
