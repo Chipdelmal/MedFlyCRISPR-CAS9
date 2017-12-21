@@ -10,7 +10,13 @@ Lorem ipsum
 
 ### Datasets
 
-Folders named *N____* store the data for the simulations with population size dictated by the digits following the *N* multiplied by 1000.
+The datasets are compressed in _7z_ format, which can be unarchived using free software such as: [Keka](http://www.kekaosx.com/en/) or [7zip](http://www.7-zip.org/download.html).
+
+#### Population Dynamics Examples
+
+#### Population Suppression Thresholds as Function of Resistant Allele Regeneration Rate
+
+Files named *N____.7z.___* store the data for the simulations with population size dictated by the digits following the *N* multiplied by 1000.
 
 Each one of the files contained within these folders is named according to the following nomenclature:
 
