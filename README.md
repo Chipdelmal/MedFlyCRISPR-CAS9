@@ -30,7 +30,6 @@ Where the IDs are specified as follows:
         3: Population size of 100000
 
     * Y: Resistant allele regeneration rate
-
         - 1:  .01e-3
         - 2:  .02e-3
         - 3:  .03e-3
@@ -65,7 +64,6 @@ Where the IDs are specified as follows:
         - 32: 50e-3
 
       * Z: Repetition number
-
         - Each experiment was repeated 52 times
 
 ## Authors
