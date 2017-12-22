@@ -12,8 +12,16 @@ For these experiments we performed a 1:1 CRISPR/CAS9 release into the population
 
 We released individuals at resistant allele regeneration rates of: .001,.01,.1; and repeated each experiment 60 times.
 
+#### Rho = 10^-1
+
 ![populationDynamics](./images/MedflySuppression_1.jpg)
+
+#### Rho = 10^-2
+
 ![populationDynamics](./images/MedflySuppression_2.jpg)
+
+#### Rho = 10^-3
+
 ![populationDynamics](./images/MedflySuppression_3.jpg)
 
 
