@@ -8,9 +8,9 @@ Two sets of experiments took place as part of this modeling endeavor, which will
 
 ### Population Dynamics Visual Inspection
 
-For these experiments we performed a 1:1 CRISPR/CAS9 release into the population with various resistant allele regeneration rates to show the general dynamics expected from the gene drive.
+For these experiments we performed a 1:1 CRISPR/CAS9 release into the population with various resistant allele regeneration rates to show the general dynamics expected from the gene drive. This is intended as a demonstration of how the drive works in suppressing the population.
 
-This is intended as a demonstration of how the drive works in suppressing the population.
+We released individuals at resistant allele regeneration rates of: .001,.01,.1; and repeated each experiment 60 times.
 
 ![populationDynamics](./images/MedflySuppression_1.jpg)
 ![populationDynamics](./images/MedflySuppression_2.jpg)
