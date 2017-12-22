@@ -20,7 +20,7 @@ This is intended as a demonstration of how the drive works in suppressing the po
 
 After the visual inspection, we did a thorough exploration of the population suppression probabilities at three population sizes: 1000, 10000, and 100000. This was done with 1:1 releases at various levels of resistant allele regeneration rates (see the _Datasets/Population Suppression Thresholds as Function of Resistant Allele Regeneration Rate_ section of this document for more information of the rates used).
 
-![populationDynamics](./images/ResponseN001.jpg)
+![populationDynamics](./images/Overlay.jpg)
 
 ## Files Descriptions
 
@@ -40,13 +40,13 @@ The datasets are compressed in _7z_ format, which can be unarchived using free s
 
 #### Population Dynamics Visual Inspection
 
-Files named *VI_N___.7z.___* store the data for the visual inspection simulations with population size dictated by the digits following the *N* divided by 1000.
+Files named *VI_N___.7z* store the data for the visual inspection simulations with population size dictated by the digits following the *N* divided by 1000.
 
 For the nomenclature of these filenames please refer to the following section of this document (as it describes in detail the key for the naming conventions).
 
 #### Population Suppression Thresholds as Function of Resistant Allele Regeneration Rate
 
-Files named *CT_N___.7z.___* store the data for the simulations con the calculation of suppression thresholds, with population size dictated by the digits following the *N* divided by 1000.
+Files named *CT_N___.7z* store the data for the simulations con the calculation of suppression thresholds, with population size dictated by the digits following the *N* divided by 1000.
 
 Each one of the files contained within these folders is named according to the following nomenclature:
 
