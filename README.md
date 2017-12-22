@@ -12,8 +12,9 @@ For these experiments we performed a 1:1 CRISPR/CAS9 release into the population
 
 This is intended as a demonstration of how the drive works in suppressing the population.
 
-![populationDynamics](./images/Medfly_001_1.jpg)
-![populationDynamics](./images/Medfly_001_2.jpg)
+![populationDynamics](./images/MedflySuppression_1.jpg)
+![populationDynamics](./images/MedflySuppression_2.jpg)
+![populationDynamics](./images/MedflySuppression_3.jpg)
 
 
 ### Calculation of Population Suppression Thresholds as Function of Resistant Allele Regeneration Rate
