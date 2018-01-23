@@ -33,7 +33,11 @@ vignettes/*.pdf
 *.knit.md
 images/.DS_Store
 
-Datasets/N001
-Datasets/N010
-Datasets/N100
-Datasets/Visual
+Datasets/Fertile_WDXX/N001
+Datasets/Fertile_WDXX/N010
+Datasets/Fertile_WDXX/N100
+Datasets/Fertile_WDXX/Visual
+Datasets/Infertile_WDXX/N001
+Datasets/Infertile_WDXX/N010
+Datasets/Infertile_WDXX/N100
+Datasets/Infertile_WDXX/Visual
