@@ -32,3 +32,8 @@ vignettes/*.pdf
 *.utf8.md
 *.knit.md
 images/.DS_Store
+
+Datasets/N001
+Datasets/N010
+Datasets/N100
+Datasets/Visual
