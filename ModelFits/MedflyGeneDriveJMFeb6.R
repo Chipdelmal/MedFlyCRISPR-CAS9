@@ -18,7 +18,7 @@ library(grid)
 #########################################################################
 
 ## Read in the data from drive experiments:
-setwd("/Users/sanchez.hmsc/Desktop/Mo/")
+setwd("/Users/chipdelmal/Documents/Github/MedFlyCRISPR-CAS9/ModelFits/")
 
 Data <- read.csv("HomingTraLocusGenerationalData.csv")
 Data
@@ -96,13 +96,14 @@ D_R5_F_Pos <- Data$D_R5_F_Pos; D_R5_F_Neg <- Data$D_R5_F_Neg; D_R5_F_All <- Data
 #  * WR, WB, DR, RB: fitness = 1 (only need one copy of tra)
 #  * WD, DD, DB, BB: fitness = 0 (sterile male)
 
-logLike_HomingMod <- function(eD, rho, prR, sR, Male_Pos_Data, Male_Neg_Data, Male_Total_Data,
+logLike_HomingMod <- function(prHome, prCleave, prR, sR, Male_Pos_Data, Male_Neg_Data, Male_Total_Data,
                              Female_Pos_Data, Female_Neg_Data, Female_Total_Data) {
 
   Total_Data <- Male_Total_Data + Female_Total_Data
 
-  rhoR <- (1-eD)*rho*prR
-  rhoB <- (1-eD)*rho*(1-prR)
+  rhoR <- prCleave*(1-prHome)*prR
+  rhoB <- prCleave*(1-prHome)*(1-prR)
+  eD   <- prCleave*prHome
 
   WW_XX <- (Female_Neg_Data[1] / Total_Data[1])
   WD_XX <- (Female_Pos_Data[1] / Total_Data[1])
@@ -135,28 +136,16 @@ logLike_HomingMod <- function(eD, rho, prR, sR, Male_Pos_Data, Male_Neg_Data, Ma
 	for (i in 2:length(Total_Data)) {
 
     # Calculate allele frequencies among male parents:
-	  D_Freq_Males <- (0.5*(1 + eD)*WD_XY[i-1] + 1*DD_XY[i-1] + 0.5*DR_XY[i-1] +
-	                     0.5*DB_XY[i-1] + 0*WR_XY[i-1] + 0*WB_XY[i-1] + 0*RR_XY[i-1] +
-	                     0.5*RB_XY[i-1] + 0*BB_XY[i-1] + 0*WW_XY[i-1])
-	  R_Freq_Males <- (0.5*rhoR*WD_XY[i-1] + 0*DD_XY[i-1] + 0.5*DR_XY[i-1] +
-	                     0*DB_XY[i-1] + 0.5*WR_XY[i-1] + 0*WB_XY[i-1] + 1*RR_XY[i-1] +
-	                     0.5*RB_XY[i-1] + 0*BB_XY[i-1] + 0*WW_XY[i-1])
-	  B_Freq_Males <- (0.5*rhoB*WD_XY[i-1] + 0*DD_XY[i-1] + 0*DR_XY[i-1] +
-	                     0.5*DB_XY[i-1] + 0*WR_XY[i-1] + 0.5*WB_XY[i-1] + 0*RR_XY[i-1] +
-	                     0.5*RB_XY[i-1] + 1*BB_XY[i-1] + 0*WW_XY[i-1])
-	  W_Freq_Males <- (0.5*(1 - eD - rhoR - rhoB)*WD_XY[i-1] + 0*DD_XY[i-1] + 0*DR_XY[i-1] +
-	                     0*DB_XY[i-1] + 0.5*WR_XY[i-1] + 0.5*WB_XY[i-1] + 0*RR_XY[i-1] +
-	                     0*RB_XY[i-1] + 0*BB_XY[i-1] + 1*WW_XY[i-1])
+	  D_Freq_Males <- (0.5*(1+eD)*WD_XY[i-1] + 1*DD_XY[i-1] + 0.5*DR_XY[i-1] + 0.5*DB_XY[i-1])
+	  R_Freq_Males <- (0.5*rhoR*WD_XY[i-1] + 0.5*DR_XY[i-1] + 0.5*WR_XY[i-1] + RR_XY[i-1] + 0.5*RB_XY[i-1])
+	  B_Freq_Males <- (0.5*rhoB*WD_XY[i-1] + 0.5*DB_XY[i-1] + 0.5*WB_XY[i-1] + 0.5*RB_XY[i-1] + BB_XY[i-1])
+	  W_Freq_Males <- (0.5*(1-eD-rhoR-rhoB)*WD_XY[i-1] + 0.5*WR_XY[i-1] + 0.5*WB_XY[i-1] + WW_XY[i-1])
 
 	  # Calculate allele frequencies among female parents:
-	  D_Freq_Females <- (0.5*(1 + eD)*WD_XX[i-1] + 0.5*DR_XX[i-1] + 0*WR_XX[i-1] +
-	                       0*WB_XX[i-1] + 0*RR_XX[i-1] + 0*RB_XX[i-1] + 0*WW_XX[i-1])
-	  R_Freq_Females <- (0.5*rhoR*WD_XX[i-1] + 0.5*DR_XX[i-1] + 0.5*WR_XX[i-1] +
-	                      0*WB_XX[i-1] + 1*RR_XX[i-1] + 0.5*RB_XX[i-1] + 0*WW_XX[i-1])
-	  B_Freq_Females <- (0.5*rhoB*WD_XX[i-1] + 0*DR_XX[i-1] + 0*WR_XX[i-1] +
-	                      0.5*WB_XX[i-1] + 0*RR_XX[i-1] + 0.5*RB_XX[i-1] + 0*WW_XX[i-1])
-	  W_Freq_Females <- (0.5*(1 - eD - rhoR - rhoB)*WD_XX[i-1] + 0*DR_XX[i-1] + 0.5*WR_XX[i-1] +
-	                      0.5*WB_XX[i-1] + 0*RR_XX[i-1] + 0*RB_XX[i-1] + 1*WW_XX[i-1])
+	  D_Freq_Females <- (0.5*DR_XX[i-1])
+	  R_Freq_Females <- (0.5*DR_XX[i-1] + 0.5*WR_XX[i-1] + RR_XX[i-1] + 0.5*RB_XX[i-1])
+	  B_Freq_Females <- (0.5*WB_XX[i-1] + 0.5*RB_XX[i-1])
+	  W_Freq_Females <- (0.5*WR_XX[i-1] + 0.5*WB_XX[i-1] + WW_XX[i-1])
 
 	  # Calculate allele frequencies among offspring (unnormalized):
 	  WW <- W_Freq_Males * W_Freq_Females
@@ -225,70 +214,70 @@ logLike_HomingMod <- function(eD, rho, prR, sR, Male_Pos_Data, Male_Neg_Data, Ma
 
 ## Calculate log likelihood for all experiments:
 
-logLike_AllExpts <- function(eD, rho, prR, sR) {
+logLike_AllExpts <- function(prHome, prCleave, prR, sR) {
 
   logLikeAll <- (
 
-    logLike_HomingMod(eD, rho, prR, sR, A_R1_M_Pos, A_R1_M_Neg, A_R1_M_All, A_R1_F_Pos, A_R1_F_Neg, A_R1_F_All) +
-    logLike_HomingMod(eD, rho, prR, sR, A_R2_M_Pos, A_R2_M_Neg, A_R2_M_All, A_R2_F_Pos, A_R2_F_Neg, A_R2_F_All) +
-    logLike_HomingMod(eD, rho, prR, sR, A_R3_M_Pos, A_R3_M_Neg, A_R3_M_All, A_R3_F_Pos, A_R3_F_Neg, A_R3_F_All) +
-    logLike_HomingMod(eD, rho, prR, sR, A_R4_M_Pos, A_R4_M_Neg, A_R4_M_All, A_R4_F_Pos, A_R4_F_Neg, A_R4_F_All) +
-    logLike_HomingMod(eD, rho, prR, sR, A_R5_M_Pos, A_R5_M_Neg, A_R5_M_All, A_R5_F_Pos, A_R5_F_Neg, A_R5_F_All) +
+    logLike_HomingMod(prHome, prCleave, prR, sR, A_R1_M_Pos, A_R1_M_Neg, A_R1_M_All, A_R1_F_Pos, A_R1_F_Neg, A_R1_F_All) +
+    logLike_HomingMod(prHome, prCleave, prR, sR, A_R2_M_Pos, A_R2_M_Neg, A_R2_M_All, A_R2_F_Pos, A_R2_F_Neg, A_R2_F_All) +
+    logLike_HomingMod(prHome, prCleave, prR, sR, A_R3_M_Pos, A_R3_M_Neg, A_R3_M_All, A_R3_F_Pos, A_R3_F_Neg, A_R3_F_All) +
+    logLike_HomingMod(prHome, prCleave, prR, sR, A_R4_M_Pos, A_R4_M_Neg, A_R4_M_All, A_R4_F_Pos, A_R4_F_Neg, A_R4_F_All) +
+    logLike_HomingMod(prHome, prCleave, prR, sR, A_R5_M_Pos, A_R5_M_Neg, A_R5_M_All, A_R5_F_Pos, A_R5_F_Neg, A_R5_F_All) +
 
-    logLike_HomingMod(eD, rho, prR, sR, B_R1_M_Pos, B_R1_M_Neg, B_R1_M_All, B_R1_F_Pos, B_R1_F_Neg, B_R1_F_All) +
-    logLike_HomingMod(eD, rho, prR, sR, B_R2_M_Pos, B_R2_M_Neg, B_R2_M_All, B_R2_F_Pos, B_R2_F_Neg, B_R2_F_All) +
-    logLike_HomingMod(eD, rho, prR, sR, B_R3_M_Pos, B_R3_M_Neg, B_R3_M_All, B_R3_F_Pos, B_R3_F_Neg, B_R3_F_All) +
-    logLike_HomingMod(eD, rho, prR, sR, B_R4_M_Pos, B_R4_M_Neg, B_R4_M_All, B_R4_F_Pos, B_R4_F_Neg, B_R4_F_All) +
-    logLike_HomingMod(eD, rho, prR, sR, B_R5_M_Pos, B_R5_M_Neg, B_R5_M_All, B_R5_F_Pos, B_R5_F_Neg, B_R5_F_All) +
+    logLike_HomingMod(prHome, prCleave, prR, sR, B_R1_M_Pos, B_R1_M_Neg, B_R1_M_All, B_R1_F_Pos, B_R1_F_Neg, B_R1_F_All) +
+    logLike_HomingMod(prHome, prCleave, prR, sR, B_R2_M_Pos, B_R2_M_Neg, B_R2_M_All, B_R2_F_Pos, B_R2_F_Neg, B_R2_F_All) +
+    logLike_HomingMod(prHome, prCleave, prR, sR, B_R3_M_Pos, B_R3_M_Neg, B_R3_M_All, B_R3_F_Pos, B_R3_F_Neg, B_R3_F_All) +
+    logLike_HomingMod(prHome, prCleave, prR, sR, B_R4_M_Pos, B_R4_M_Neg, B_R4_M_All, B_R4_F_Pos, B_R4_F_Neg, B_R4_F_All) +
+    logLike_HomingMod(prHome, prCleave, prR, sR, B_R5_M_Pos, B_R5_M_Neg, B_R5_M_All, B_R5_F_Pos, B_R5_F_Neg, B_R5_F_All) +
 
-    logLike_HomingMod(eD, rho, prR, sR, C_R1_M_Pos, C_R1_M_Neg, C_R1_M_All, C_R1_F_Pos, C_R1_F_Neg, C_R1_F_All) +
-    logLike_HomingMod(eD, rho, prR, sR, C_R2_M_Pos, C_R2_M_Neg, C_R2_M_All, C_R2_F_Pos, C_R2_F_Neg, C_R2_F_All) +
-    logLike_HomingMod(eD, rho, prR, sR, C_R3_M_Pos, C_R3_M_Neg, C_R3_M_All, C_R3_F_Pos, C_R3_F_Neg, C_R3_F_All) +
-    logLike_HomingMod(eD, rho, prR, sR, C_R4_M_Pos, C_R4_M_Neg, C_R4_M_All, C_R4_F_Pos, C_R4_F_Neg, C_R4_F_All) +
-    logLike_HomingMod(eD, rho, prR, sR, C_R5_M_Pos, C_R5_M_Neg, C_R5_M_All, C_R5_F_Pos, C_R5_F_Neg, C_R5_F_All) +
+    logLike_HomingMod(prHome, prCleave, prR, sR, C_R1_M_Pos, C_R1_M_Neg, C_R1_M_All, C_R1_F_Pos, C_R1_F_Neg, C_R1_F_All) +
+    logLike_HomingMod(prHome, prCleave, prR, sR, C_R2_M_Pos, C_R2_M_Neg, C_R2_M_All, C_R2_F_Pos, C_R2_F_Neg, C_R2_F_All) +
+    logLike_HomingMod(prHome, prCleave, prR, sR, C_R3_M_Pos, C_R3_M_Neg, C_R3_M_All, C_R3_F_Pos, C_R3_F_Neg, C_R3_F_All) +
+    logLike_HomingMod(prHome, prCleave, prR, sR, C_R4_M_Pos, C_R4_M_Neg, C_R4_M_All, C_R4_F_Pos, C_R4_F_Neg, C_R4_F_All) +
+    logLike_HomingMod(prHome, prCleave, prR, sR, C_R5_M_Pos, C_R5_M_Neg, C_R5_M_All, C_R5_F_Pos, C_R5_F_Neg, C_R5_F_All) +
 
-    logLike_HomingMod(eD, rho, prR, sR, D_R1_M_Pos, D_R1_M_Neg, D_R1_M_All, D_R1_F_Pos, D_R1_F_Neg, D_R1_F_All) +
-    logLike_HomingMod(eD, rho, prR, sR, D_R2_M_Pos, D_R2_M_Neg, D_R2_M_All, D_R2_F_Pos, D_R2_F_Neg, D_R2_F_All) +
-    logLike_HomingMod(eD, rho, prR, sR, D_R3_M_Pos, D_R3_M_Neg, D_R3_M_All, D_R3_F_Pos, D_R3_F_Neg, D_R3_F_All) +
-    logLike_HomingMod(eD, rho, prR, sR, D_R4_M_Pos, D_R4_M_Neg, D_R4_M_All, D_R4_F_Pos, D_R4_F_Neg, D_R4_F_All) +
-    logLike_HomingMod(eD, rho, prR, sR, D_R5_M_Pos, D_R5_M_Neg, D_R5_M_All, D_R5_F_Pos, D_R5_F_Neg, D_R5_F_All) )
+    logLike_HomingMod(prHome, prCleave, prR, sR, D_R1_M_Pos, D_R1_M_Neg, D_R1_M_All, D_R1_F_Pos, D_R1_F_Neg, D_R1_F_All) +
+    logLike_HomingMod(prHome, prCleave, prR, sR, D_R2_M_Pos, D_R2_M_Neg, D_R2_M_All, D_R2_F_Pos, D_R2_F_Neg, D_R2_F_All) +
+    logLike_HomingMod(prHome, prCleave, prR, sR, D_R3_M_Pos, D_R3_M_Neg, D_R3_M_All, D_R3_F_Pos, D_R3_F_Neg, D_R3_F_All) +
+    logLike_HomingMod(prHome, prCleave, prR, sR, D_R4_M_Pos, D_R4_M_Neg, D_R4_M_All, D_R4_F_Pos, D_R4_F_Neg, D_R4_F_All) +
+    logLike_HomingMod(prHome, prCleave, prR, sR, D_R5_M_Pos, D_R5_M_Neg, D_R5_M_All, D_R5_F_Pos, D_R5_F_Neg, D_R5_F_All) )
 
   logLikeAll
 }
 
 ## Prior function:
-logPrior <- function(eD, rho, prR, sR) {
+logPrior <- function(prHome, prCleave, prR, sR) {
   # Prior on eD:
   # logPrior_eD <- dunif(eD, min = 0, max = 1, log = TRUE)
-  logPrior_eD <- dnorm(eD, mean = 0.56, sd = 0.16, log = TRUE)
+  logPrior_prHome <- dnorm(prHome, mean = 0.56, sd = 0.16, log = TRUE)
   # Prior on rho:
-  logPrior_rho <- dunif(rho, min = 0, max = 1, log = TRUE)
+  logPrior_prCleave <- dunif(prCleave, min = 0, max = 1, log = TRUE)
   # Prior on prR:
   # logPrior_prR <- dunif(prR, min = 0, max = 1, log = TRUE)
   logPrior_prR <- dnorm(prR, mean = 0.36, sd = 0.052, log = TRUE)
   # Prior on sR:
   logPrior_sR <- dunif(sR, min = 0, max = 1, log = TRUE)
 
-  return(logPrior_eD + logPrior_rho + logPrior_prR + logPrior_sR)
+  return(logPrior_prHome + logPrior_prCleave + logPrior_prR + logPrior_sR)
 }
 
 ## Posterior function:
 logPosterior <- function(theta) {
   ## Extract parameters from theta vector:
-  eD <- theta[["eD"]]; rho <- theta[["rho"]]; prR <- theta[["prR"]]; sR <- theta[["sR"]];
+  prHome <- theta[["prHome"]]; prCleave <- theta[["prCleave"]]; prR <- theta[["prR"]]; sR <- theta[["sR"]];
 
   ## Calculate the log prior:
-  logPrior <- logPrior(eD, rho, prR, sR)
+  logPrior <- logPrior(prHome, prCleave, prR, sR)
 
   ## Calculate the log likelihood of the data:
-  logLike <- logLike_AllExpts(eD, rho, prR, sR)
+  logLike <- logLike_AllExpts(prHome, prCleave, prR, sR)
 
   ## Calculate the posterior:
   logPosterior <- logPrior + logLike
   return(logPosterior)
 }
 
-theta <- c(eD = 0.30, rho = 1, prR = 0.33, sR = 0.1)
+theta <- c(prHome = 0.30, prCleave = 1, prR = 0.33, sR = 0.1)
 logPosterior(theta)
 
 #########################################################################
@@ -311,14 +300,14 @@ mcmcMH <- function(logPosterior, initTheta, proposalSD, numIterations) {
   for (i in 1:numIterations) {
     # Draw a new theta from a Gaussian proposal distribution and
     # assign this to a variable called thetaProposed:
-    eD_Proposed <- rtruncnorm(n = 1, a = 0, b = 1, mean = thetaCurrent[["eD"]],
-                               sd = proposalSD[["eD"]])
-    rho_Proposed <- rnorm(n = 1, mean = thetaCurrent[["rho"]], sd = proposalSD[["rho"]])
+    prHome_Proposed <- rtruncnorm(n = 1, a = 0, b = 1, mean = thetaCurrent[["prHome"]],
+                                  sd = proposalSD[["prHome"]])
+    prCleave_Proposed <- rnorm(n = 1, mean = thetaCurrent[["prCleave"]], sd = proposalSD[["prCleave"]])
     prR_Proposed <- rtruncnorm(n = 1, a = 0, b = 1, mean = thetaCurrent[["prR"]],
-                                 sd = proposalSD[["prR"]])
+                               sd = proposalSD[["prR"]])
     sR_Proposed <- rnorm(n = 1, mean = thetaCurrent[["sR"]],
-                               sd = proposalSD[["sR"]])
-    thetaProposed <- c(eD = eD_Proposed, rho = rho_Proposed, prR = prR_Proposed,
+                         sd = proposalSD[["sR"]])
+    thetaProposed <- c(prHome = prHome_Proposed, prCleave = prCleave_Proposed, prR = prR_Proposed,
                        sR = sR_Proposed)
 
     # Evaluate the log posterior function at the proposed theta value:
@@ -348,11 +337,11 @@ mcmcMH <- function(logPosterior, initTheta, proposalSD, numIterations) {
 
 # Running the MCMC algorithm to vary the parameters e, sHet and sHom:
 mcmcTrace <- mcmcMH(logPosterior = logPosterior, # posterior distribution
-                    initTheta = c(eD = 0.56, rho = 1,
-                                  prR = 0.25, sR = 0.1), # intial parameter guess
+                    initTheta = c(prHome = 0.56, prCleave = 1,
+                                  prR = 0.33, sR = 0), # intial parameter guess
                                   # prR = 0.25, sR = 0), # intial parameter guess
-                    proposalSD = c(eD = 0.01, rho = 0,
-                                   prR = 0.01, sR = 0.01), # standard deviations of
+                    proposalSD = c(prHome = 0.01, prCleave = 0,
+                                   prR = 0, sR = 0.01), # standard deviations of
                                    # prR = 0.01, sR = 0), # standard deviations of
                     # parameters for Gaussian proposal distribution
                     numIterations = 10000) # number of iterations
@@ -395,11 +384,11 @@ autocorr.plot(traceBurnAndThin)
 ## 10000 iterations beyond the 1000 iterations for burn-in:
 
 mcmcTrace <- mcmcMH(logPosterior = logPosterior, # posterior distribution
-                    initTheta = c(eD = 0.56, rho = 1,
-                                  prR = 0.25, sR = 0.1), # intial parameter guess
+                    initTheta = c(prHome = 0.89, prCleave = 0.99,
+                                  prR = 0.99, sR = 0), # intial parameter guess
                     # prR = 0.25, sR = 0), # intial parameter guess
-                    proposalSD = c(eD = 0.01, rho = 0,
-                                   prR = 0.01, sR = 0.01), # standard deviations of
+                    proposalSD = c(prHome = 0.003, prCleave = 0.0003,
+                                   prR = 0.003, sR = 0.003), # standard deviations of
                     # prR = 0.01, sR = 0), # standard deviations of
                     # parameters for Gaussian proposal distribution
                     numIterations = 20000) # number of iterations
@@ -424,7 +413,7 @@ summary(traceBurn)
 ## Calculating the DIC, we have:
 logLikeTraceBurn <- rep(0, length(traceBurn[,1]))
 for (i in 1:length(traceBurn[,1])) {
-  logLikeTraceBurn[i] <- logLike_AllExpts(eD = traceBurn[[i,1]], rho = traceBurn[[i,2]],
+  logLikeTraceBurn[i] <- logLike_AllExpts(prHome = traceBurn[[i,1]], prCleave = traceBurn[[i,2]],
                                           prR = traceBurn[[i,3]], sR = traceBurn[[i,4]])
   if (i %% 100 == 0) {
     print(i)
@@ -432,8 +421,8 @@ for (i in 1:length(traceBurn[,1])) {
 }
 pD <- 0.5*var(-2*logLikeTraceBurn) # Effective number of parameters
 
-logLikeMean <- logLike_AllExpts(eD = mean(traceBurn[,1]),
-                                rho = mean(traceBurn[,2]),
+logLikeMean <- logLike_AllExpts(prHome = mean(traceBurn[,1]),
+                                prCleave = mean(traceBurn[,2]),
                                 prR = mean(traceBurn[,3]),
                                 sR = mean(traceBurn[,4]))
 
@@ -445,18 +434,17 @@ DIC_ModelFitnessCosts
 #########################################################################
 
 ## Let's use the following parameter values for the plots:
-# eD_Fitted <- 0.56; rho_Fitted <- 1; prR_Fitted <- 0.308; sR_Fitted <- 0;
-# eD_Fitted <- 0.327; rho_Fitted <- 1; prR_Fitted <- 0.281; sR_Fitted <- 0.016;
-# eD_Fitted <- 0.303; rho_Fitted <- 1; prR_Fitted <- 0.372; sR_Fitted <- 0.112;
-eD_Fitted <- 0.302; rho_Fitted <- 1; prR_Fitted <- 0.388; sR_Fitted <- 0.128;
+# prHome_Fitted <- 0.886; prCleave_Fitted <- 0.9999; prR_Fitted <- 0.9943; sR_Fitted <- 0.1268;
+prHome_Fitted <- 0.892; prCleave_Fitted <- 1; prR_Fitted <- 0.33; sR_Fitted <- 0;
 
 ## Trajectory calculation for model spread of Drosophila homing system
 ## through a population:
 
-traj_HomingMod <- function(eD, rho, prR, WW_XX_0, WD_XX_0, WW_XY_0, WD_XY_0, numGens, sR) {
+traj_HomingMod <- function(prHome, prCleave, prR, WW_XX_0, WD_XX_0, WW_XY_0, WD_XY_0, numGens, sR) {
 
-  rhoR <- (1-eD)*rho*prR
-  rhoB <- (1-eD)*rho*(1-prR)
+  rhoR <- prCleave*(1-prHome)*prR
+  rhoB <- prCleave*(1-prHome)*(1-prR)
+  eD   <- prCleave*prHome
 
   WW_XX <- WW_XX_0
   WD_XX <- WD_XX_0
@@ -498,33 +486,17 @@ traj_HomingMod <- function(eD, rho, prR, WW_XX_0, WD_XX_0, WW_XY_0, WD_XY_0, num
 
   for (i in 2:numGens) {
 
-    # Calculate allele frequencies among fertile male parents:
-    Freq_Fertile_Males <- (WD_XY[i-1] + DD_XY[i-1] + DR_XY[i-1] + DB_XY[i-1] + WR_XY[i-1] +
-                           WB_XY[i-1] + RR_XY[i-1] + RB_XY[i-1] + BB_XY[i-1] + WW_XY[i-1])
-    D_Freq_Males <- (0.5*(1 + eD)*WD_XY[i-1] + 1*DD_XY[i-1] + 0.5*DR_XY[i-1] +
-                       0.5*DB_XY[i-1] + 0*WR_XY[i-1] + 0*WB_XY[i-1] + 0*RR_XY[i-1] +
-                       0*RB_XY[i-1] + 0*BB_XY[i-1] + 0*WW_XY[i-1]) / Freq_Fertile_Males
-    R_Freq_Males <- (0.5*rhoR*WD_XY[i-1] + 0*DD_XY[i-1] + 0.5*DR_XY[i-1] +
-                       0*DB_XY[i-1] + 0.5*WR_XY[i-1] + 0*WB_XY[i-1] + 1*RR_XY[i-1] +
-                       0.5*RB_XY[i-1] + 0*BB_XY[i-1] + 0*WW_XY[i-1]) / Freq_Fertile_Males
-    B_Freq_Males <- (0.5*rhoB*WD_XY[i-1] + 0*DD_XY[i-1] + 0*DR_XY[i-1] +
-                       0.5*DB_XY[i-1] + 0*WR_XY[i-1] + 0.5*WB_XY[i-1] + 0*RR_XY[i-1] +
-                       0.5*RB_XY[i-1] + 1*BB_XY[i-1] + 0*WW_XY[i-1]) / Freq_Fertile_Males
-    W_Freq_Males <- (0.5*(1 - eD - rhoR - rhoB)*WD_XY[i-1] + 0*DD_XY[i-1] + 0*DR_XY[i-1] +
-                       0*DB_XY[i-1] + 0.5*WR_XY[i-1] + 0.5*WB_XY[i-1] + 0*RR_XY[i-1] +
-                       0*RB_XY[i-1] + 0*BB_XY[i-1] + 1*WW_XY[i-1]) / Freq_Fertile_Males
+    # Calculate allele frequencies among male parents:
+    D_Freq_Males <- (0.5*(1+eD)*WD_XY[i-1] + 1*DD_XY[i-1] + 0.5*DR_XY[i-1] + 0.5*DB_XY[i-1])
+    R_Freq_Males <- (0.5*rhoR*WD_XY[i-1] + 0.5*DR_XY[i-1] + 0.5*WR_XY[i-1] + RR_XY[i-1] + 0.5*RB_XY[i-1])
+    B_Freq_Males <- (0.5*rhoB*WD_XY[i-1] + 0.5*DB_XY[i-1] + 0.5*WB_XY[i-1] + 0.5*RB_XY[i-1] + BB_XY[i-1])
+    W_Freq_Males <- (0.5*(1-eD-rhoR-rhoB)*WD_XY[i-1] + 0.5*WR_XY[i-1] + 0.5*WB_XY[i-1] + WW_XY[i-1])
 
-    # Calculate allele frequencies among fertile female parents:
-    Freq_Fertile_Females <- (DR_XX[i-1] + WR_XX[i-1] + WB_XX[i-1] + RR_XX[i-1] +
-                             RB_XX[i-1] + WW_XX[i-1] + WD_XX[i-1])
-    D_Freq_Females <- (0.5*(1 + eD)*WD_XX[i-1] + 0.5*DR_XX[i-1] + 0*WR_XX[i-1] + 0*WB_XX[i-1] +
-                         0*RR_XX[i-1] + 0*RB_XX[i-1] + 0*WW_XX[i-1]) / Freq_Fertile_Females
-    R_Freq_Females <- (0.5*rhoR*WD_XX[i-1] + 0.5*DR_XX[i-1] + 0.5*WR_XX[i-1] + 0*WB_XX[i-1] +
-                         1*RR_XX[i-1] + 0.5*RB_XX[i-1] + 0*WW_XX[i-1]) / Freq_Fertile_Females
-    B_Freq_Females <- (0.5*rhoB*WD_XX[i-1] + 0*DR_XX[i-1] + 0*WR_XX[i-1] + 0.5*WB_XX[i-1] +
-                         0*RR_XX[i-1] + 0.5*RB_XX[i-1] + 0*WW_XX[i-1]) / Freq_Fertile_Females
-    W_Freq_Females <- (0.5*(1 - eD - rhoR - rhoB)*WD_XX[i-1] + 0*DR_XX[i-1] + 0.5*WR_XX[i-1] + 0.5*WB_XX[i-1] +
-                         0*RR_XX[i-1] + 0*RB_XX[i-1] + 1*WW_XX[i-1]) / Freq_Fertile_Females
+    # Calculate allele frequencies among female parents:
+    D_Freq_Females <- (0.5*DR_XX[i-1])
+    R_Freq_Females <- (0.5*DR_XX[i-1] + 0.5*WR_XX[i-1] + RR_XX[i-1] + 0.5*RB_XX[i-1])
+    B_Freq_Females <- (0.5*WB_XX[i-1] + 0.5*RB_XX[i-1])
+    W_Freq_Females <- (0.5*WR_XX[i-1] + 0.5*WB_XX[i-1] + WW_XX[i-1])
 
     # Calculate allele frequencies among offspring (unnormalized):
     WW <- W_Freq_Males * W_Freq_Females
@@ -538,7 +510,7 @@ traj_HomingMod <- function(eD, rho, prR, WW_XX_0, WD_XX_0, WW_XY_0, WD_XY_0, num
     RB <- R_Freq_Males * B_Freq_Females + B_Freq_Males * R_Freq_Females
     BB <- B_Freq_Males * B_Freq_Females
 
-    NormalizingFactor <- (WW + WD + WR + DD + WB + DB + BB) + (RR + DR + RB)*(1-sR/2)
+    NormalizingFactor <- (WW + WD + WR + WB + DB + DD + BB) + (DR + RR + RB)*(1-sR/2)
 
     WW_XY[i] <- WW/(2*NormalizingFactor) ; WW_XX[i] <- WW/(2*NormalizingFactor)
     WD_XY[i] <- WD/(2*NormalizingFactor) ; WD_XX[i] <- WD/(2*NormalizingFactor)
@@ -624,31 +596,33 @@ D_R4_M_Obs[2] <- (D_R4_M_Obs[1] + D_R4_M_Obs[3])/2 ; D_R4_F_Obs[2] <- (D_R4_F_Ob
 
 ## Calculate the predicted trajectories for plotting:
 
-A_Pred <- traj_HomingMod(eD = eD_Fitted, rho = rho_Fitted, prR = prR_Fitted,
+A_Pred <- traj_HomingMod(prHome = prHome_Fitted, prCleave = prCleave_Fitted, prR = prR_Fitted,
                          WW_XX_0 = 30/(30 + 33), WD_XX_0 = 0/(30 + 33), WW_XY_0 = 30/(30 + 33), WD_XY_0 =  3/(30 + 33), numGens = 9,
                          sR = sR_Fitted)
 A_M_Pred <- as.data.frame(A_Pred)$Male_Pos_Pred
 A_F_Pred <- as.data.frame(A_Pred)$Female_Pos_Pred
 
-B_Pred <- traj_HomingMod(eD = eD_Fitted, rho = rho_Fitted, prR = prR_Fitted,
+B_Pred <- traj_HomingMod(prHome = prHome_Fitted, prCleave = prCleave_Fitted, prR = prR_Fitted,
                          WW_XX_0 = 30/(30 + 45), WD_XX_0 = 0/(30 + 45), WW_XY_0 = 30/(30 + 45), WD_XY_0 = 15/(30 + 45), numGens = 9,
                          sR = sR_Fitted)
 B_M_Pred <- as.data.frame(B_Pred)$Male_Pos_Pred
 B_F_Pred <- as.data.frame(B_Pred)$Female_Pos_Pred
 
-C_Pred <- traj_HomingMod(eD = eD_Fitted, rho = rho_Fitted, prR = prR_Fitted,
+C_Pred <- traj_HomingMod(prHome = prHome_Fitted, prCleave = prCleave_Fitted, prR = prR_Fitted,
                          WW_XX_0 = 30/(30 + 60), WD_XX_0 = 0/(30 + 60), WW_XY_0 = 30/(30 + 60), WD_XY_0 = 30/(30 + 60), numGens = 9,
                          sR = sR_Fitted)
 C_M_Pred <- as.data.frame(C_Pred)$Male_Pos_Pred
 C_F_Pred <- as.data.frame(C_Pred)$Female_Pos_Pred
 
-D_Pred <- traj_HomingMod(eD = eD_Fitted, rho = rho_Fitted, prR = prR_Fitted,
+D_Pred <- traj_HomingMod(prHome = prHome_Fitted, prCleave = prCleave_Fitted, prR = prR_Fitted,
                          WW_XX_0 = 30/(30 + 30), WD_XX_0 = 0/(30 + 30), WW_XY_0 =  0/(30 + 30), WD_XY_0 = 30/(30 + 30), numGens = 9,
                          sR = sR_Fitted)
 D_M_Pred <- as.data.frame(D_Pred)$Male_Pos_Pred
 D_F_Pred <- as.data.frame(D_Pred)$Female_Pos_Pred
 
 ## Collate observed & predicted data into a data frame:
+
+gens <- 1:9
 
 homingResults <- data.frame(gens,
                             A_M_Pred, A_R1_M_Obs, A_R2_M_Obs, A_R3_M_Obs, A_R4_M_Obs, A_R5_M_Obs,
@@ -802,6 +776,8 @@ homingResultsFigure <- data.frame(gens,
 
 ## All release scenarios, males:
 
+gens <- 1:9
+
 Male_Plot <- ggplot(homingResultsFigure, aes(x = gens, y = A_M_Pred, color = Expt)) +
   geom_line(aes(y = A_M_Pred  , col = "1"), linetype = "dashed", size = 1.2) +
   geom_line(aes(y = A_Av_M_Obs, col = "1"), size = 1.2) +
@@ -828,22 +804,24 @@ Female_Plot <- ggplot(homingResultsFigure, aes(x = gens, y = A_F_Pred, color = E
   labs(x = "Generation", y = "Proportion positive") +
   ggtitle("All release scenarios, females")
 
-## Model predictions for fitted model parameters:
+#####################################################################
+## Model predictions for fitted model parameters:                  ##
+#####################################################################
 
 numGens <- 150
-A_Pred <- traj_HomingMod(eD = eD_Fitted, rho = rho_Fitted, prR = prR_Fitted,
-                         WW_XX_0 = 30/(30 + 33), WD_XX_0 = 0/(30 + 33), WW_XY_0 = 30/(30 + 33), WD_XY_0 =  3/(30 + 33), numGens = numGens,
+D_Pred <- traj_HomingMod(prHome = prHome_Fitted, prCleave = prCleave_Fitted, prR = prR_Fitted,
+                         WW_XX_0 = 30/(30 + 45), WD_XX_0 = 0/(30 + 45), WW_XY_0 = 30/(30 + 45), WD_XY_0 = 15/(30 + 45), numGens = numGens,
                          sR = sR_Fitted)
-A_Female_Pred <- as.data.frame(A_Pred)$Female_Pred
-A_D_Allele_Pred <- as.data.frame(A_Pred)$D_Allele_Pred
-A_W_Allele_Pred <- as.data.frame(A_Pred)$W_Allele_Pred
-A_R_Allele_Pred <- as.data.frame(A_Pred)$R_Allele_Pred
-A_B_Allele_Pred <- as.data.frame(A_Pred)$B_Allele_Pred
+D_Female_Pred <- as.data.frame(D_Pred)$Female_Pred
+D_D_Allele_Pred <- as.data.frame(D_Pred)$D_Allele_Pred
+D_W_Allele_Pred <- as.data.frame(D_Pred)$W_Allele_Pred
+D_R_Allele_Pred <- as.data.frame(D_Pred)$R_Allele_Pred
+D_B_Allele_Pred <- as.data.frame(D_Pred)$B_Allele_Pred
 
 ## Model predictions for ideal model parameters:
 
-I_Pred <- traj_HomingMod(eD = 0.99, rho = 1, prR = 0.33,
-                         WW_XX_0 = 30/(30 + 33), WD_XX_0 = 0/(30 + 33), WW_XY_0 = 30/(30 + 33), WD_XY_0 =  3/(30 + 33), numGens = numGens,
+I_Pred <- traj_HomingMod(prHome = 0.98, prCleave = 1, prR = 0.33,
+                         WW_XX_0 = 30/(30 + 45), WD_XX_0 = 0/(30 + 45), WW_XY_0 = 30/(30 + 45), WD_XY_0 = 15/(30 + 45), numGens = numGens,
                          sR = 0)
 I_Female_Pred <- as.data.frame(I_Pred)$Female_Pred
 I_D_Allele_Pred <- as.data.frame(I_Pred)$D_Allele_Pred
@@ -854,21 +832,21 @@ I_B_Allele_Pred <- as.data.frame(I_Pred)$B_Allele_Pred
 gens <- 1:numGens
 
 DrosophilaModelPred <- data.frame(gens,
-                                  A_Female_Pred, A_D_Allele_Pred, A_W_Allele_Pred,
-                                  A_R_Allele_Pred, A_B_Allele_Pred,
+                                  D_Female_Pred, D_D_Allele_Pred, D_W_Allele_Pred,
+                                  D_R_Allele_Pred, D_B_Allele_Pred,
                                   I_Female_Pred, I_D_Allele_Pred, I_W_Allele_Pred,
                                   I_R_Allele_Pred, I_B_Allele_Pred)
 
 ## Model predictions for
 
-Fitted_Params_Plot <- ggplot(DrosophilaModelPred, aes(x = gens, y = A_Female_Pred, color = Allele/Sex)) +
-  geom_line(aes(y = A_Female_Pred, col = "Female"), linetype = "dashed", size = 1.2) +
-  geom_line(aes(y = A_D_Allele_Pred, col = "D allele"), size = 1.2) +
-  geom_line(aes(y = A_W_Allele_Pred, col = "W allele"), size = 1.2) +
-  geom_line(aes(y = A_R_Allele_Pred, col = "R allele"), size = 1.2) +
-  geom_line(aes(y = A_B_Allele_Pred, col = "B allele"), size = 1.2) +
+Fitted_Params_Plot <- ggplot(DrosophilaModelPred, aes(x = gens, y = D_Female_Pred, color = Allele/Sex)) +
+  geom_line(aes(y = D_Female_Pred, col = "Female"), linetype = "dashed", size = 1.2) +
+  geom_line(aes(y = D_D_Allele_Pred, col = "D allele"), size = 1.2) +
+  geom_line(aes(y = D_W_Allele_Pred, col = "W allele"), size = 1.2) +
+  geom_line(aes(y = D_R_Allele_Pred, col = "R allele"), size = 1.2) +
+  geom_line(aes(y = D_B_Allele_Pred, col = "B allele"), size = 1.2) +
   labs(x = "Generation", y = "Proportion") +
-  ggtitle("Release 1, fitted parameters")
+  ggtitle("Release 2, fitted parameters")
 
 Ideal_Params_Plot <- ggplot(DrosophilaModelPred, aes(x = gens, y = I_Female_Pred, color = Allele/Sex)) +
   geom_line(aes(y = I_Female_Pred, col = "Female"), linetype = "dashed", size = 1.2) +
@@ -877,9 +855,9 @@ Ideal_Params_Plot <- ggplot(DrosophilaModelPred, aes(x = gens, y = I_Female_Pred
   geom_line(aes(y = I_R_Allele_Pred, col = "R allele"), size = 1.2) +
   geom_line(aes(y = I_B_Allele_Pred, col = "B allele"), size = 1.2) +
   labs(x = "Generation", y = "Proportion") +
-  ggtitle("Release 1, ideal parameters")
+  ggtitle("Release 2, ideal parameters")
 
 multiplot(Male_Plot, Fitted_Params_Plot, Female_Plot, Ideal_Params_Plot, cols=2)
 
-
-write.csv2(homingResultsFigure,file="modelFit.csv",sep = ",")
+write.csv(homingResultsFigure,file="modelFit.csv",sep = ",")
+write.csv(DrosophilaModelPred,file="modelFit2.csv",sep = ",")
