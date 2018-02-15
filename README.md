@@ -6,31 +6,6 @@ This repository contains the data for the MedFlies population suppression model 
 
 Two sets of experiments took place as part of this modeling endeavor, which will be described in the following subsections of this document.
 
-### Population Dynamics Visual Inspection
-
-For these experiments we performed a 1:1 CRISPR/CAS9 release into the population with various resistant allele regeneration rates to show the general dynamics expected from the gene drive. This is intended as a demonstration of how the drive works in suppressing the population.
-
-We released individuals at resistant allele regeneration rates of: .001,.01,.1; and repeated each experiment 60 times.
-
-#### Rho = 10^-1
-
-![populationDynamics](./images/MedflySuppression_1.jpg)
-
-#### Rho = 10^-2
-
-![populationDynamics](./images/MedflySuppression_2.jpg)
-
-#### Rho = 10^-3
-
-![populationDynamics](./images/MedflySuppression_3.jpg)
-
-
-### Calculation of Population Suppression Thresholds as Function of Resistant Allele Regeneration Rate
-
-After the visual inspection, we did a thorough exploration of the population suppression probabilities at three population sizes: 1000, 10000, and 100000. This was done with 1:1 releases at various levels of resistant allele regeneration rates (see the _Datasets/Population Suppression Thresholds as Function of Resistant Allele Regeneration Rate_ section of this document for more information of the rates used).
-
-![populationDynamics](./images/Overlay.jpg)
-
 ## Files Descriptions
 
 As part of the publication, we are releasing the dataset files used to generate our figures for reproducibility purposes.
